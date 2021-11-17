@@ -141,38 +141,71 @@ int handle_socket(int new_socket)
         // int real_file_size = atoi(file_size + 16);
         // printf("%d\n", real_file_size);
         // printf("real : %d\n",strlen(message));
-
-        memset(message, 0x00, sizeof(message));
+	//memset(message, 0x00, sizeof(message));
 
         if (!des_fd)
         {
             perror("dest_fd error : ");
         }
         char tmp[20000];
-        int cont = 0;
+        int cont;
+        int num = 0;
         int counter = 0;
-        while (counter < content_length && recv(new_socket, message, 1, 0) )
+        //numchars = get_line(new_socket, message, sizeof(message));
+	//printf("%s",message);
+        while (counter < content_length)
         {
-            //memset(tmp,0,sizeof(tmp));
-            counter++;
-            //printf("%d:%s ",counter, message);
-            //write(des_fd,message,strlen(message));
-            for(int i=0;i<1;i++)
+            idx = 0;
+            cont = read(new_socket, message, 100000);
+            memset(tmp,0,sizeof(tmp));
+            //printf("%d ",cont);
+            counter += cont;
+            printf("%d ",counter);
+            //printf("%s ", message);
+            //write(des_fd, message, numchars);
+            // numchars = get_line(new_socket, message, sizeof(message));
+            //             printf("%d ",numchars);
+            // printf("%s ", message);
+            for(int i=0;i<cont;i++)
             {
                 if(message[i]=='-')
                 {
-                    cont++;
+		            tmp[idx++] = message[i];
+                    num++;
                 }
-                else
+                else 
                 {
-                    write(des_fd, message, 1);
-                    cont = 0;
+                    tmp[idx++] = message[i];
+                    num = 0;
                 }
-                if(cont==5)
+                if(num==5)
                     break;
             }
-            if(cont==5)
+            if(num==5)
+            {
+		        idx -= 5;
+                for(int i=idx-1;i>0;i--)
+                {
+                    if(tmp[i]=='\n' && tmp[i-1]=='\r')
+                    {
+                        printf("!!!!!!\n");
+                        //tmp[i-1] = '\0';
+			            idx -= 2;
+                        break;
+                    }
+                }
+		//printf("%s", tmp);
+                write(des_fd, tmp, idx);
                 break;
+            }
+            else
+            {
+                //printf("%s", tmp);
+                write(des_fd, tmp, cont);
+            }
+            // if(num==5)
+            //     break;
+            //write(des_fd, tmp, cont);
 
             // printf("ret: %d\n", ret);
             // counter += ret;
@@ -209,7 +242,7 @@ int handle_socket(int new_socket)
             write(new_socket, message, ret);
         }
 
-        char cmd[1024];
+        char cmd[102400];
         sprintf(cmd, "mv ./penguin.txt ./%s", file_name);
         system(cmd);
 
@@ -291,7 +324,7 @@ int main(int argc, char *argv[])
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
     int random_port = rand() % 60000;
-    server.sin_port = htons(8080);
+    server.sin_port = htons(random_port);
     int pid;
 
     //Bind
@@ -301,7 +334,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     puts("bind done");
-    printf("bind to %d port\n", 8080);
+    printf("bind to %d port\n", random_port);
 
     listen(socket_desc, 5);
     signal(SIGCHLD, sigchld);
