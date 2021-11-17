@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
     int random_port = rand() % 60000;
-    server.sin_port = htons(random_port);
+    server.sin_port = htons(8080);
     int pid;
 
     //Bind
@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     puts("bind done");
-    printf("bind to %d port\n", random_port);
+    printf("bind to %d port\n", 8080);
 
     listen(socket_desc, 5);
     signal(SIGCHLD, sigchld);
