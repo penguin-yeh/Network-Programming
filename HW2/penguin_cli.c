@@ -327,7 +327,7 @@ void start()
         }
         else if(strcmp(buffer, "whoami\n")==0)
         {
-            printf("NOW : %s\n", account);
+            printf("[NOW]%s\n", account);
         }
         else if(strcmp(buffer, "time\n")==0)
         {
@@ -335,7 +335,7 @@ void start()
             struct tm *p;
             time(&timep);
             p = gmtime(&timep);
-            printf("%d/%d/%d %d:%d:%d\n", 1900+p->tm_year, 1+p->tm_mon, p->tm_mday, 8+p->tm_hour, p->tm_min, p->tm_sec);
+            printf("[TIME]%d/%d/%d %d:%d:%d\n", 1900+p->tm_year, 1+p->tm_mon, p->tm_mday, 8+p->tm_hour, p->tm_min, p->tm_sec);
         }
         else if(strcmp(buffer, "\0")!=0)
         {
